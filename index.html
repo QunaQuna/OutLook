@@ -737,8 +737,9 @@ input[type="number"] {
                     <ol id="instructionsList">
                         <li>Thiết lập folder và rules ở các mục bên dưới</li>
                         <li>Set-ExecutionPolicy Bypass -Scope Process -Force</li>
-                        <li>.\yourfile.ps1 -Mailbox user@company.com</li>
+                        
                         <li>Chạy lệnh: <code>Unblock-File -Path "đường-dẫn-đến-file.ps1"</code></li>
+                        <li>.\yourfile.ps1 -Mailbox user@company.com</li>
                     </ol>
                 </div>
             </div>
@@ -770,7 +771,11 @@ input[type="number"] {
             
             <div class="section">
                 <h2 class="section-title"><i class="fas fa-filter"></i> Rules Tự Động Nâng Cao</h2>
-                
+                <ul style="font-size: 12px;">
+                    <li>Sau khi chọn loại điều kiện thì nhấn nút thêm điều kiện 1 lần nữa</li>
+                    <li>Các từ khóa của điều kiện ngăn cách nhau bằng nhấn Enter</li>
+                    <li>Tương tự với thêm action của rules</li>
+                </ul>
                 <div id="rulesContainer">
                     <div class="empty-state" id="emptyRules">
                         <i class="fas fa-filter"></i>
