@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng dẫn sử dụng - Exchange Online Rules Generator</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- DataTables CSS (chỉ lấy phần cần thiết) -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.6/css/responsive.bootstrap5.min.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .main-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        /* Sticky Sidebar Navigation */
+        .sidebar-nav {
+            width: 280px;
+            position: sticky;
+            top: 20px;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+
+        .sidebar-nav.visible {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .sidebar-nav-inner {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .sidebar-nav-inner::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-nav-inner::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .sidebar-nav-inner::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .sidebar-nav h3 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-nav a {
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .sidebar-nav a:hover {
+            background: #f0f0ff;
+            color: #667eea;
+            padding-left: 16px;
+        }
+
+        .sidebar-nav a.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-nav a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            background: #667eea;
+            border-radius: 2px;
+            transition: height 0.3s;
+        }
+
+        .sidebar-nav a:hover::before {
+            height: 70%;
+        }
+
+        .sidebar-nav a.active::before {
+            display: none;
+        }
+
+        .container {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        .toc h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .toc a:hover {
+            color: #764ba2;
+            padding-left: 5px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            scroll-margin-top: 20px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section h3 {
+            color: #4a6491;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .section h4 {
+            color: #667eea;
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-box i {
+            color: #ffc107;
+            margin-right: 10px;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-box i {
+            color: #17a2b8;
+            margin-right: 10px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .success-box i {
+            color: #28a745;
+            margin-right: 10px;
+        }
+
+        .danger-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .danger-box i {
+            color: #dc3545;
+            margin-right: 10px;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'PowerShell';
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .inline-code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #e83e8c;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .screenshot {
+            max-width: 100%;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card i {
+            font-size: 36px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Table container for scrolling */
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        /* Đặc biệt cho bảng conditions và actions - KHÔNG có .table-container bao ngoài */
+        .conditions-actions-container {
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        table.dataTable {
+            width: 100% !important;
+            margin: 0 !important;
+            border-spacing: 0;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Ẩn tất cả các controls của DataTables */
+        .dataTables_wrapper {
+            position: relative;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            display: none !important;
+        }
+
+        /* Style cho DataTables scroll */
+        .dataTables_scroll {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .dataTables_scrollHead {
+            overflow: hidden !important;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .dataTables_scrollBody {
+            overflow-y: auto !important;
+            max-height: 400px !important;
+        }
+
+        /* Fix for responsive tables */
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control:before,
+        table.dataTable.dtr-inline.collapsed>tbody>tr>th.dtr-control:before {
+            background-color: #667eea;
+        }
+
+        /* Simple scrollbar styling */
+        .table-container::-webkit-scrollbar,
+        .dataTables_scrollBody::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track,
+        .dataTables_scrollBody::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb,
+        .dataTables_scrollBody::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover,
+        .dataTables_scrollBody::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            text-decoration: none;
+            z-index: 1000;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar-nav {
+                display: none;
+            }
+
+            .main-wrapper {
+                display: block;
+            }
+            
+            .table-container,
+            .dataTables_scrollBody {
+                max-height: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .table-container,
+            .dataTables_scrollBody {
+                max-height: 300px;
+            }
+            
+            table th, table td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .sidebar-nav,
+            .back-to-top {
+                display: none;
+            }
+
+            .main-wrapper {
+                display: block;
+            }
+            
+            .table-container,
+            .dataTables_scrollBody {
+                max-height: none;
+                overflow: visible;
+                border: none;
+            }
+            
+            .dataTables_scroll {
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Sticky Sidebar Navigation -->
+        <nav class="sidebar-nav" id="sidebarNav">
+            <div class="sidebar-nav-inner">
+                <h3><i class="fas fa-bars"></i> Mục lục</h3>
+                <ul>
+                    <li><a href="#gioi-thieu" class="nav-link">1. Giới thiệu</a></li>
+                    <li><a href="#yeu-cau" class="nav-link">2. Yêu cầu hệ thống</a></li>
+                    <li><a href="#cai-dat-module" class="nav-link">3. Cài đặt Module</a></li>
+                    <li><a href="#su-dung-tool" class="nav-link">4. Sử dụng công cụ</a></li>
+                    <li><a href="#tao-script" class="nav-link">5. Tạo và chạy Script</a></li>
+                    <li><a href="#vi-du" class="nav-link">6. Ví dụ thực tế</a></li>
+                    <li><a href="#troubleshooting" class="nav-link">7. Xử lý sự cố</a></li>
+                    <li><a href="#faq" class="nav-link">8. FAQ</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-book"></i> Hướng dẫn sử dụng</h1>
+                <p>Exchange Online Rules Generator v2.0</p>
+            </div>
+
+            <div class="content">
+                <!-- Table of Contents (sẽ ẩn khi scroll) -->
+                <div class="toc" id="initialToc">
+                    <h2><i class="fas fa-list"></i> Mục lục</h2>
+                    <ul>
+                        <li><a href="#gioi-thieu">1. Giới thiệu</a></li>
+                        <li><a href="#yeu-cau">2. Yêu cầu hệ thống</a></li>
+                        <li><a href="#cai-dat-module">3. Cài đặt Exchange Online Module</a></li>
+                        <li><a href="#su-dung-tool">4. Sử dụng công cụ</a></li>
+                        <li><a href="#tao-script">5. Tạo và chạy PowerShell Script</a></li>
+                        <li><a href="#vi-du">6. Ví dụ thực tế</a></li>
+                        <li><a href="#troubleshooting">7. Xử lý sự cố</a></li>
+                        <li><a href="#faq">8. Câu hỏi thường gặp</a></li>
+                    </ul>
+                </div>
+
+                <!-- 1. Giới thiệu -->
+                <section id="gioi-thieu" class="section">
+                    <h2><i class="fas fa-info-circle"></i> 1. Giới thiệu</h2>
+                    
+                    <p>Exchange Online Rules Generator là công cụ web giúp bạn tạo script PowerShell tự động để thiết lập:</p>
+                    <ul>
+                        <li>Cấu trúc folder trong Outlook (hỗ trợ tối đa 5 cấp)</li>
+                        <li>Rules tự động phân loại email</li>
+                        <li>Tự động hóa quy trình quản lý email</li>
+                    </ul>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-folder-tree"></i>
+                            <h4>Folder 5 cấp</h4>
+                            <p>Tạo cấu trúc folder phức tạp với tối đa 5 cấp độ</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-filter"></i>
+                            <h4>Rules nâng cao</h4>
+                            <p>Điều kiện và hành động đa dạng cho email</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-bolt"></i>
+                            <h4>Tự động cập nhật</h4>
+                            <p>Thay đổi ngay lập tức, không cần nhấn nút</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-palette"></i>
+                            <h4>Giao diện đẹp</h4>
+                            <p>UI/UX hiện đại với SweetAlert2 và animations</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. Yêu cầu hệ thống -->
+                <section id="yeu-cau" class="section">
+                    <h2><i class="fas fa-laptop"></i> 2. Yêu cầu hệ thống</h2>
+
+                    <h3>2.1. Phần cứng và hệ điều hành</h3>
+                    <div class="table-container">
+                        <table id="hardwareTable" class="display" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Thành phần</th>
+                                    <th>Yêu cầu tối thiểu</th>
+                                    <th>Khuyến nghị</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Hệ điều hành</td>
+                                    <td>Windows 10/11</td>
+                                    <td>Windows 11 (bản mới nhất)</td>
+                                </tr>
+                                <tr>
+                                    <td>PowerShell</td>
+                                    <td>PowerShell 5.1</td>
+                                    <td>PowerShell 7.x</td>
+                                </tr>
+                                <tr>
+                                    <td>RAM</td>
+                                    <td>4 GB</td>
+                                    <td>8 GB trở lên</td>
+                                </tr>
+                                <tr>
+                                    <td>Trình duyệt</td>
+                                    <td>Chrome, Edge, Firefox</td>
+                                    <td>Chrome hoặc Edge (bản mới nhất)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>2.2. Phần mềm cần thiết</h3>
+                    <ul>
+                        <li><strong>PowerShell 5.1 trở lên</strong> - Đã có sẵn trên Windows 10/11</li>
+                        <li><strong>Exchange Online Management Module</strong> - Xem hướng dẫn cài đặt bên dưới</li>
+                        <li><strong>Tài khoản Microsoft 365</strong> - Có quyền quản lý Exchange Online</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Lưu ý:</strong> Bạn cần có quyền Administrator trên máy tính để cài đặt module và chạy script.
+                    </div>
+                </section>
+
+                <!-- 3. Cài đặt Exchange Online Module -->
+                <section id="cai-dat-module" class="section">
+                    <h2><i class="fas fa-download"></i> 3. Cài đặt Exchange Online Management Module</h2>
+
+                    <div class="warning-box">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Quan trọng:</strong> Bạn PHẢI cài đặt module này trước khi chạy script PowerShell được tạo ra từ công cụ.
+                    </div>
+
+                    <h3>3.1. Kiểm tra xem đã cài đặt chưa</h3>
+                    
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <div>
+                            <div class="step-title">Mở PowerShell với quyền Administrator</div>
+                            <ul>
+                                <li>Nhấn <span class="inline-code">Windows + X</span></li>
+                                <li>Chọn "Windows PowerShell (Admin)" hoặc "Terminal (Admin)"</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div>
+                            <div class="step-title">Chạy lệnh kiểm tra</div>
+                            <div class="code-block">Get-Module -ListAvailable -Name ExchangeOnlineManagement</div>
+                            <p><strong>Kết quả:</strong></p>
+                            <ul>
+                                <li>Nếu thấy thông tin module → Đã cài đặt, bỏ qua bước 3.2</li>
+                                <img src="AnhHD\2-1.png">
+                                <li>Nếu không có kết quả gì → Chưa cài đặt, làm theo bước 3.2</li>
+                                <img src="AnhHD\2-2.png">
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>3.2. Cài đặt module (nếu chưa có)</h3>
+
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <div>
+                            <div class="step-title">Mở PowerShell với quyền Administrator</div>
+                            <p>Làm tương tự bước 3.1</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div>
+                            <div class="step-title">Thiết lập ExecutionPolicy</div>
+                            <div class="code-block">Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force</div>
+                            <img src="AnhHD\3-1-1.PNG">
+                            <div class="info-box">
+                                <i class="fas fa-info-circle"></i>
+                                Lệnh này cho phép chạy các script đã ký số từ nguồn tin cậy.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <div>
+                            <div class="step-title">Cài đặt module từ PowerShell Gallery</div>
+                            <div class="code-block">Install-Module -Name ExchangeOnlineManagement -Force -AllowClobber</div>
+                            <img src="AnhHD\3-1-2.PNG">
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Lưu ý:</strong> Quá trình cài đặt có thể mất 2-5 phút. Nếu hỏi về NuGet provider, chọn <strong>Yes</strong> hoặc <strong>Y</strong>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">4</span>
+                        <div>
+                            <div class="step-title">Xác nhận cài đặt thành công</div>
+                            <div class="code-block">Get-Module -ListAvailable -Name ExchangeOnlineManagement</div>
+                            <img src="AnhHD\3-1-3.PNG">
+                            <div class="success-box">
+                                <i class="fas fa-check-circle"></i>
+                                Bạn sẽ thấy thông tin về module, bao gồm Version, Name, và ExportedCommands.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>3.3. Cập nhật module (khuyến nghị)</h3>
+                    <p>Nếu đã cài đặt từ trước, nên cập nhật lên phiên bản mới nhất:</p>
+                    <div class="code-block">Update-Module -Name ExchangeOnlineManagement -Force</div>
+                    <img src="AnhHD\3-2-1.PNG">
+
+                    <h3>3.4. Xử lý lỗi cài đặt</h3>
+
+                    <h4>Lỗi: "Unable to resolve package source"</h4>
+                    <div class="code-block"># Đăng ký lại PowerShell Gallery
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+Register-PSRepository -Default -InstallationPolicy Trusted</div>
+
+                    <h4>Lỗi: "Running scripts is disabled"</h4>
+                    <div class="code-block"># Kiểm tra ExecutionPolicy hiện tại
+Get-ExecutionPolicy
+
+# Thay đổi nếu cần
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force</div>
+
+                    <h4>Lỗi: "Administrator rights required"</h4>
+                    <div class="danger-box">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Giải pháp:</strong> Đóng PowerShell và mở lại với quyền Administrator (chuột phải → "Run as administrator")
+                    </div>
+                </section>
+
+                <!-- 4. Sử dụng công cụ -->
+                <section id="su-dung-tool" class="section">
+                    <h2><i class="fas fa-mouse-pointer"></i> 4. Sử dụng công cụ web</h2>
+
+                    <h3>4.1. Mở công cụ</h3>
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <div>
+                            <div class="step-title">Đảm bảo có đủ 3 file</div>
+                            <ul>
+                                <li><span class="inline-code">index.html</span> - File HTML chính</li>
+                                <li><span class="inline-code">styles.css</span> - File CSS</li>
+                                <li><span class="inline-code">script.js</span> - File JavaScript</li>
+                            </ul>
+                            <img src="AnhHD\4-1-1.PNG">
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Cả 3 file phải nằm cùng 1 thư mục!
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div>
+                            <div class="step-title">Mở file index.html</div>
+                            <p>Chuột phải vào file → Chọn trình duyệt (Chrome, Edge, Firefox...)</p>
+                        </div>
+                    </div>
+
+                    <h3>4.2. Nhập thông tin tài khoản</h3>
+                    <div class="step">
+                        <div class="step-title">Nhập email Exchange Online</div>
+                        <ul>
+                            <li>Ví dụ: <span class="inline-code">quannh@vasport.com.vn</span></li>
+                            <li>Đây là email bạn dùng để đăng nhập Microsoft 365</li>
+                        </ul>
+                        <img src="AnhHD\4-2.PNG">
+                    </div>
+
+                    <h3>4.3. Tạo cấu trúc Folder</h3>
+
+                    <h4>Cách 1: Sử dụng Template có sẵn</h4>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-calculator"></i>
+                            <h4>Template Kế toán</h4>
+                            <p>Cấu trúc folder cho phòng kế toán với hóa đơn, báo cáo, thuế</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-project-diagram"></i>
+                            <h4>Template Dự án</h4>
+                            <p>Tổ chức theo dự án với tài liệu, hợp đồng, liên hệ</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-list"></i>
+                            <h4>Template Đơn giản</h4>
+                            <p>3 folder cơ bản: Cần xử lý, Đã xử lý, Lưu trữ</p>
+                        </div>
+                    </div>
+
+                    <h4>Cách 2: Tạo folder thủ công</h4>
+                    
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <div>
+                            <div class="step-title">Nhấn nút "Thêm Folder Mới"</div>
+                            <img src="AnhHD\4-3.PNG">
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div>
+                            <div class="step-title">Điền thông tin folder</div>
+                            <ul>
+                                <li><strong>Tên folder:</strong> VD: "THỬ NGHIỆM"</li>
+                                    Trong tool khi đặt tên thế này sẽ tự động chuyển về "Thử nghiệm", muốn giữ nguyên viết hoa thì phải 
+                                    <ul>
+                                        <li>Thêm số thứ tự + dấu chấm hoặc dấu gạch dưới ở đầu ví dụ:</li>
+                                        <li>01. THỬ NGHIỆM → Giữ nguyên 100%</li>
+                                        <li>2. THỬ NGHIỆM</li>
+                                        <li>3_THỬ_NGHIỆM</li>
+                                    </ul>
+                                <li><strong>Folder cha:</strong> Chọn folder gốc hoặc folder cha (nếu muốn tạo folder con)</li>
+                            </ul>
+                            
+                            <img src="AnhHD\4-3-2.PNG">
+                            <div class="info-box">
+                                <i class="fas fa-info-circle"></i>
+                                Hỗ trợ tối đa 5 cấp folder. Ví dụ: Inbox → Folder1 → Folder2 → Folder3 → Folder4 → Folder5
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <div>
+                            <div class="step-title">Thêm folder con</div>
+                            <p>Nhấn nút <i class="fas fa-plus" style="color: #28a745;"></i> bên cạnh folder để thêm folder con</p>
+                            <img src="AnhHD\4-3-3.PNG">
+                        </div>
+                    </div>
+
+                    <h3>4.4. Tạo Rules tự động</h3>
+
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <div>
+                            <div class="step-title">Nhấn "Thêm Rule Mới"</div>
+                            <p>Rule mặc định sẽ có 1 điều kiện và 1 hành động</p>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div>
+                            <div class="step-title">Đặt tên cho Rule</div>
+                            <p>Ví dụ: "Email hóa đơn đầu vào"</p>
+                            <img src="AnhHD\4-4-1.PNG" >
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <div>
+                            <div class="step-title">Thêm điều kiện (Conditions)</div>
+                            <p><strong>Tính năng TỰ ĐỘNG CẬP NHẬT:</strong></p>
+                            <ul>
+                                <li>Chọn loại điều kiện từ dropdown → Tự động hiển thị ô nhập tương ứng</li>
+                                <li>Nhập giá trị → Tự động lưu</li>
+                                <li>Với từ khóa: Nhập và nhấn <kbd>Enter</kbd> để thêm</li>
+                                <li>Không cần nhấn nút "Lưu" hay "Cập nhật"</li>
+                            </ul>
+                            
+                            <h4>Các loại điều kiện:</h4>
+                            <div class="conditions-actions-container">
+                                <!-- Chỉ có table, không có .table-container bao ngoài -->
+                                <table id="conditionsTable" class="display" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Loại</th>
+                                            <th>Mô tả</th>
+                                            <th>Ví dụ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>From</td>
+                                            <td>Email từ người gửi</td>
+                                            <td>supplier@company.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td>To</td>
+                                            <td>Email gửi đến</td>
+                                            <td>recipient@company.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Cc</td>
+                                            <td>Email trong Cc</td>
+                                            <td>cc@company.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td>My name is on the To line</td>
+                                            <td>Tên tôi nằm trong dòng To</td>
+                                            <td>Có / Không</td>
+                                        </tr>
+                                        <tr>
+                                            <td>My name is on the Cc line</td>
+                                            <td>Tên tôi nằm trong dòng Cc</td>
+                                            <td>Có / Không</td>
+                                        </tr>
+                                        <tr>
+                                            <td>I'm the only recipient</td>
+                                            <td>Tôi là người nhận duy nhất</td>
+                                            <td>Có / Không</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Subject includes</td>
+                                            <td>Tiêu đề chứa từ khóa</td>
+                                            <td>hóa đơn, invoice</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Subject or body includes</td>
+                                            <td>Tiêu đề hoặc nội dung chứa từ khóa</td>
+                                            <td>thanh toán</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Message body includes</td>
+                                            <td>Nội dung email chứa từ khóa</td>
+                                            <td>báo giá</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sender address includes</td>
+                                            <td>Địa chỉ người gửi chứa chuỗi</td>
+                                            <td>@company.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Importance</td>
+                                            <td>Mức độ quan trọng</td>
+                                            <td>High / Normal / Low</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Has attachment</td>
+                                            <td>Email có file đính kèm</td>
+                                            <td>Có / Không</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Flagged</td>
+                                            <td>Email được gắn cờ</td>
+                                            <td>Có / Không</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Size greater than</td>
+                                            <td>Kích thước lớn hơn (KB)</td>
+                                            <td>1024 (= 1MB)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Size less than</td>
+                                            <td>Kích thước nhỏ hơn (KB)</td>
+                                            <td>500</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Received after date</td>
+                                            <td>Nhận sau ngày</td>
+                                            <td>01/01/2025</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Received before date</td>
+                                            <td>Nhận trước ngày</td>
+                                            <td>31/12/2025</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">4</span>
+                        <div>
+                            <div class="step-title">Thêm hành động (Actions)</div>
+                            <p><strong>Tính năng TỰ ĐỘNG CẬP NHẬT:</strong></p>
+                            <ul>
+                                <li>Chọn loại hành động → UI tự động thay đổi</li>
+                                <li>Chọn giá trị → Tự động lưu ngay</li>
+                            </ul>
+
+                            <h4>Các loại hành động:</h4>
+                            <div class="conditions-actions-container">
+                                <!-- Chỉ có table, không có .table-container bao ngoài -->
+                                <table id="actionsTable" class="display" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Loại</th>
+                                            <th>Mô tả</th>
+                                            <th>Cần chọn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Move to folder</td>
+                                            <td>Di chuyển email vào folder</td>
+                                            <td>Chọn folder đích</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Copy to folder</td>
+                                            <td>Sao chép email vào folder</td>
+                                            <td>Chọn folder đích</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Delete message</td>
+                                            <td>Xóa email</td>
+                                            <td>Không cần</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mark as read</td>
+                                            <td>Đánh dấu đã đọc</td>
+                                            <td>Không cần</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mark as Junk</td>
+                                            <td>Đánh dấu là thư rác</td>
+                                            <td>Không cần</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Set importance</td>
+                                            <td>Đặt mức độ quan trọng</td>
+                                            <td>High / Normal / Low</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Apply category</td>
+                                            <td>Gán nhãn (category)</td>
+                                            <td>Nhập tên category</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Forward to</td>
+                                            <td>Chuyển tiếp email</td>
+                                            <td>email@company.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Redirect to</td>
+                                            <td>Chuyển hướng email</td>
+                                            <td>email@company.com</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">5</span>
+                        <div>
+                            <div class="step-title">Thêm nhiều điều kiện/hành động</div>
+                            <img src="AnhHD\4-5-1.PNG">
+                            <ul>
+                                <li>Nhấn "Thêm điều kiện" để thêm điều kiện mới</li>
+                                <img src="AnhHD\4-5-2.PNG">
+                                <li>Nhấn "Thêm hành động" để thêm hành động mới</li>
+                                <img src="AnhHD\4-5-3.PNG">
+                                <li>Nhấn <i class="fas fa-times" style="color: #dc3545;"></i> để xóa</li>
+                            </ul>
+                            <div class="success-box">
+                                <i class="fas fa-magic"></i>
+                                <strong>Tính năng mới:</strong> Không cần nhấn nút "Lưu" - mọi thay đổi tự động cập nhật ngay!
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>4.5. Tùy chọn Script</h3>
+                    <ul>
+                        <li><strong>Tên file script:</strong> Đặt tên file .ps1 (mặc định: create_outlook_rules.ps1)</li>
+                        <img src="AnhHD\4-6-1.PNG">
+                        <li><strong>Ghi chú:</strong> Thêm mô tả về mục đích sử dụng script</li>
+                        <img src="AnhHD\4-6-2.PNG">
+                        <li><strong>Tạo tất cả folder:</strong> Tích để tạo folder trong script</li>
+                        <li><strong>Kích hoạt tất cả rules:</strong> Tích để enable rules ngay khi chạy</li>
+                        <img src="AnhHD\4-6-3.PNG">
+                    </ul>
+                </section>
+
+                <!-- 5. Tạo và chạy script -->
+                <section id="tao-script" class="section">
+                    <h2><i class="fas fa-file-code"></i> 5. Tạo và chạy PowerShell Script</h2>
+
+                    <h3>5.1. Tạo file script</h3>
+                    <img src="AnhHD\5-1-1.PNG">
+
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <div>
+                            <div class="step-title">Nhấn "Tải File (.ps1)"</div>
+                            <p>File script sẽ được tải về thư mục bạn chọn</p>
+                            <img src="AnhHD\5-2-2.PNG">
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div>
+                            <div class="step-title">Hoặc "Sao chép Script"</div>
+                            <ul>
+                                <li>Nhấn "Sao chép Script"</li>
+                                <li>Mở Notepad</li>
+                                <li>Paste (Ctrl+V)</li>
+                                <li>Save as → Chọn "All files" → Đặt tên file.ps1</li>
+                            </ul>
+                            <img src="AnhHD\5-2-3.PNG">
+                        </div>
+                    </div>
+
+                    <h3>5.2. Chuẩn bị chạy script</h3>
+
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <div>
+                            <div class="step-title">Mở PowerShell với quyền Administrator</div>
+                            <ul>
+                                <li>Nhấn <kbd>Windows + X</kbd></li>
+                                <li>Chọn "Windows PowerShell (Admin)"</li>
+                                <img src="AnhHD\5-3-3.PNG">
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div>
+                            <div class="step-title">Di chuyển đến thư mục chứa file</div>
+                            <img src="AnhHD\5-3-4.PNG">
+                            <div class="code-block"># Ví dụ file ở ổ D
+cd D:\
+
+# Hoặc file ở Downloads
+cd C:\Users\YourUsername\Downloads</div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <div>
+                            <div class="step-title">Thiết lập ExecutionPolicy</div>
+                            <div class="code-block">Set-ExecutionPolicy Bypass -Scope Process -Force</div>
+                            <img src="AnhHD\5-3-5.PNG">
+                            <div class="info-box">
+                                <i class="fas fa-info-circle"></i>
+                                Lệnh này cho phép chạy script trong phiên làm việc hiện tại.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">4</span>
+                        <div>
+                            <div class="step-title">Unblock file (nếu cần)</div>
+                            <div class="code-block">Unblock-File -Path ".\create_outlook_rules.ps1"</div>
+                            <img src="AnhHD\5-3-6.PNG">
+                            <div class="warning-box">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Thay đổi tên file nếu bạn đặt tên khác.
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>5.3. Chạy script</h3>
+
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <div>
+                            <div class="step-title">Chạy lệnh</div>
+                            <div class="code-block">.\create_outlook_rules.ps1</div>
+                            <img src="AnhHD\5-3-7.PNG">
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div>
+                            <div class="step-title">Đăng nhập Microsoft 365</div>
+                            <ul>
+                                <li>Cửa sổ đăng nhập sẽ mở ra</li>
+                                <li>Nhập email và mật khẩu Microsoft 365</li>
+                                <li>Xác thực 2 yếu tố (nếu có)</li>
+                            </ul>
+                            <img src="AnhHD\5-3-8.PNG">
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <div>
+                            <div class="step-title">Chờ script hoàn thành</div>
+                            <ul>
+                                <li>Script sẽ tự động tạo folders</li>
+                                <li>Tạo rules theo cấu hình</li>
+                                <li>Hiển thị kết quả từng bước</li>
+                            </ul>
+                            <div class="success-box">
+                                <i class="fas fa-check-circle"></i>
+                                Khi thấy "ĐÃ HOÀN THÀNH!" nghĩa là thành công!
+                            </div>
+                            <img src="AnhHD\5-3-9.PNG">
+                        </div>
+                    </div>
+
+                    <h3>5.4. Kiểm tra kết quả</h3>
+                    <ol>
+                        <li>Mở Outlook Web (outlook.office.com) hoặc Outlook Desktop</li>
+                        <li>Kiểm tra danh sách folders ở sidebar bên trái</li>
+                        <img src="AnhHD\5-4-1.PNG">
+                        <li>Vào Settings → Mail → Rules để xem rules đã tạo</li>
+                        <img src="AnhHD\5-4-2.PNG">
+                        <li>Gửi email thử để kiểm tra rules hoạt động</li>
+                    </ol>
+
+                </section>
+
+                <!-- 6. Ví dụ thực tế -->
+                <section id="vi-du" class="section">
+                    <h2><i class="fas fa-lightbulb"></i> 6. Ví dụ thực tế</h2>
+
+                    <h3>Ví dụ 1: Phòng Kế toán</h3>
+                    
+                    <h4>Cấu trúc Folder:</h4>
+                    <div class="code-block" style="color: #ddd; white-space: pre;">Inbox
+├── 01. HOA DON
+│   ├── DAU VAO
+│   │   ├── THANG 01
+│   │   ├── THANG 02
+│   │   └── THANG 03
+│   └── DAU RA
+├── 02. BAO CAO
+│   ├── THUE
+│   └── TAI CHINH
+└── 03. LUONG</div>
+
+                    <h4>Rules mẫu:</h4>
+                    <div class="table-container">
+                        <table id="accountingRulesTable" class="display" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Tên Rule</th>
+                                    <th>Điều kiện</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Hóa đơn đầu vào</td>
+                                    <td>• Subject chứa: "hóa đơn", "invoice"<br>• Có attachment</td>
+                                    <td>• Move to: 01. HOA DON/DAU VAO<br>• Apply category: "Hóa đơn"</td>
+                                </tr>
+                                <tr>
+                                    <td>Báo cáo thuế</td>
+                                    <td>• From: thue@gdt.gov.vn<br>• Subject chứa: "thuế"</td>
+                                    <td>• Move to: 02. BAO CAO/THUE<br>• Mark as read<br>• Forward to: ketoan@company.com</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Ví dụ 2: Quản lý Dự án</h3>
+
+                    <h4>Cấu trúc Folder:</h4>
+                    <div class="code-block" style="color: #ddd; white-space: pre;">Inbox
+├── DU AN A
+│   ├── 01. TAILIEU
+│   │   ├── HOP DONG
+│   │   ├── THIET KE
+│   │   └── BAN VE KY THUAT
+│   └── 02. LIEN HE
+│       ├── KHACH HANG
+│       └── DOI TAC
+└── DU AN B
+    └── (tương tự)</div>
+
+                    <h4>Rules mẫu:</h4>
+                    <div class="table-container">
+                        <table id="projectRulesTable" class="display" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Tên Rule</th>
+                                    <th>Điều kiện</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Hợp đồng dự án</td>
+                                    <td>• Subject chứa: "hợp đồng", "contract"<br>• Has attachment</td>
+                                    <td>• Move to: DU AN A/01. TAILIEU/HOP DONG<br>• Set importance: High</td>
+                                </tr>
+                                <tr>
+                                    <td>Email khách hàng</td>
+                                    <td>• From address chứa: "@client.com"</td>
+                                    <td>• Copy to: DU AN A/02. LIEN HE/KHACH HANG<br>• Apply category: "Khách hàng"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 7. Troubleshooting -->
+                <section id="troubleshooting" class="section">
+                    <h2><i class="fas fa-wrench"></i> 7. Xử lý sự cố</h2>
+
+                    <h3>7.1. Lỗi khi chạy script</h3>
+
+                    <h4>Lỗi: "Connect-ExchangeOnline: The term is not recognized"</h4>
+                    <div class="danger-box">
+                        <i class="fas fa-times-circle"></i>
+                        <strong>Nguyên nhân:</strong> Chưa cài đặt Exchange Online Management Module
+                    </div>
+                    <div class="success-box">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>Giải pháp:</strong> Xem lại mục <a href="#cai-dat-module">3. Cài đặt Exchange Online Module</a>
+                    </div>
+
+                    <h4>Lỗi: "Running scripts is disabled on this system"</h4>
+                    <div class="danger-box">
+                        <i class="fas fa-times-circle"></i>
+                        <strong>Nguyên nhân:</strong> ExecutionPolicy chặn chạy script
+                    </div>
+                    <div class="code-block">Set-ExecutionPolicy Bypass -Scope Process -Force</div>
+
+                    <h4>Lỗi: "New-MailboxFolder: Cannot create folder"</h4>
+                    <div class="danger-box">
+                        <i class="fas fa-times-circle"></i>
+                        <strong>Nguyên nhân:</strong> Folder đã tồn tại hoặc tên không hợp lệ
+                    </div>
+                    <div class="success-box">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>Giải pháp:</strong> 
+                        <ul>
+                            <li>Kiểm tra Outlook xem folder đã có chưa</li>
+                            <li>Tránh ký tự đặc biệt trong tên folder: / \ : * ? " < > |</li>
+                        </ul>
+                    </div>
+
+                    <h4>Lỗi: "New-InboxRule: A rule with this name already exists"</h4>
+                    <div class="success-box">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>Giải pháp:</strong> Xóa rule cũ trong Outlook Settings → Mail → Rules, hoặc đổi tên rule trong tool
+                    </div>
+
+                    <h3>7.2. Lỗi khi sử dụng tool web</h3>
+
+                    <h4>Giao diện không hiển thị đúng</h4>
+                    <ul>
+                        <li>Kiểm tra cả 3 file (index.html, styles.css, script.js) cùng thư mục</li>
+                        <li>Refresh trang (Ctrl + F5)</li>
+                        <li>Thử trình duyệt khác</li>
+                        <li>Kiểm tra Console (F12) xem có lỗi gì</li>
+                    </ul>
+
+                    <h4>Nút không hoạt động</h4>
+                    <ul>
+                        <li>Kiểm tra file script.js có tải không (F12 → Network tab)</li>
+                        <li>Refresh trang</li>
+                        <li>Xóa cache trình duyệt</li>
+                    </ul>
+
+                    <h3>7.3. Lỗi kết nối Exchange Online</h3>
+
+                    <h4>Không thể đăng nhập</h4>
+                    <ul>
+                        <li>Kiểm tra internet connection</li>
+                        <li>Đảm bảo dùng đúng tài khoản Microsoft 365</li>
+                        <li>Kiểm tra tài khoản có quyền quản lý Exchange không</li>
+                        <li>Xác thực 2 yếu tố (MFA) nếu được bật</li>
+                    </ul>
+
+                    <h4>Session timeout</h4>
+                    <div class="code-block"># Ngắt kết nối và kết nối lại
+Disconnect-ExchangeOnline -Confirm:$false
+Connect-ExchangeOnline -UserPrincipalName your@email.com</div>
+                </section>
+
+                <!-- 8. FAQ -->
+                <section id="faq" class="section">
+                    <h2><i class="fas fa-question-circle"></i> 8. Câu hỏi thường gặp (FAQ)</h2>
+
+                    <h3>Q1: Có cần license Microsoft 365 không?</h3>
+                    <p><strong>A:</strong> Có, bạn cần tài khoản Microsoft 365 với Exchange Online (Business, Enterprise, hoặc E3/E5).</p>
+
+                    <h3>Q2: Có thể tạo bao nhiêu folder và rules?</h3>
+                    <p><strong>A:</strong></p>
+                    <ul>
+                        <li><strong>Folders:</strong> Không giới hạn (tool hỗ trợ tối đa 5 cấp)</li>
+                        <li><strong>Rules:</strong> Exchange Online giới hạn 256 KB tổng dung lượng rules (khoảng 64-300 rules tùy độ phức tạp)</li>
+                    </ul>
+
+                    <h3>Q3: Script có hoạt động với Outlook Desktop không?</h3>
+                    <p><strong>A:</strong> Có, script tạo folders và rules trên Exchange Online server, nên sẽ đồng bộ xuống cả Outlook Desktop và Outlook Web.</p>
+
+                    <h3>Q4: Có thể chỉnh sửa rules sau khi tạo không?</h3>
+                    <p><strong>A:</strong> Có, bạn có thể:</p>
+                    <ul>
+                        <li>Chỉnh sửa trong Outlook Settings → Mail → Rules</li>
+                        <li>Hoặc tạo lại script mới với tool và chạy lại (xóa rules cũ trước)</li>
+                    </ul>
+
+                    <h3>Q5: Tool có lưu dữ liệu không?</h3>
+                    <p><strong>A:</strong> Không, tất cả dữ liệu chỉ tồn tại trên trình duyệt của bạn. Khi tắt trang là mất hết. Nên:</p>
+                    <ul>
+                        <li>Tải file script xuống để lưu trữ</li>
+                        <li>Hoặc sao chép script vào file text</li>
+                    </ul>
+
+                    <h3>Q6: Có thể chia sẻ script cho người khác không?</h3>
+                    <p><strong>A:</strong> Có, nhưng lưu ý:</p>
+                    <ul>
+                        <li>Thay đổi email trong script</li>
+                        <li>Người nhận cần cài Exchange Online Module</li>
+                        <li>Folder path có thể khác nhau</li>
+                    </ul>
+
+                    <h3>Q7: Tại sao một số rules không hoạt động?</h3>
+                    <p><strong>A:</strong> Kiểm tra:</p>
+                    <ul>
+                        <li>Rules có được enable không (checkbox)</li>
+                        <li>Thứ tự ưu tiên rules (rules chạy từ trên xuống)</li>
+                        <li>Điều kiện có chính xác không</li>
+                        <li>Folder đích có tồn tại không</li>
+                    </ul>
+
+                    <h3>Q8: Làm sao xóa tất cả folders và rules?</h3>
+                    <div class="code-block"># Xóa tất cả rules
+Get-InboxRule | Remove-InboxRule -Confirm:$false
+
+# Xóa folder (cẩn thận - sẽ xóa cả email bên trong!)
+# Phải xóa thủ công trong Outlook</div>
+
+                    <h3>Q9: Script có hỗ trợ tiếng Việt không?</h3>
+                    <p><strong>A:</strong> Có, script đã cấu hình UTF-8 để hỗ trợ tên folder và rules tiếng Việt có dấu.</p>
+
+                    <h3>Q10: Có thể dùng tool trên macOS/Linux không?</h3>
+                    <p><strong>A:</strong></p>
+                    <ul>
+                        <li><strong>Tool web:</strong> Có, mở trong bất kỳ trình duyệt nào</li>
+                        <li><strong>Chạy script:</strong> Có, nhưng cần cài PowerShell 7+ và Exchange Online Module cho macOS/Linux</li>
+                    </ul>
+                </section>
+
+                <!-- Footer -->
+                <div style="text-align: center; padding: 40px 0; border-top: 2px solid #e9ecef; margin-top: 40px;">
+                    <p style="color: #6c757d; font-size: 14px;">
+                        <i class="fas fa-code"></i> Exchange Online Rules Generator v2.0<br>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- DataTables JS (chỉ lấy phần cần thiết) -->
+    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.6/js/dataTables.responsive.min.js"></script>
+
+    <script>
+        // Smooth scroll for all anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Show/hide sticky sidebar and back to top button
+        const sidebarNav = document.getElementById('sidebarNav');
+        const backToTop = document.getElementById('backToTop');
+        const initialToc = document.getElementById('initialToc');
+        
+        let tocOffset = 0;
+        
+        // Calculate TOC offset after page load
+        window.addEventListener('load', () => {
+            if (initialToc) {
+                tocOffset = initialToc.offsetTop + initialToc.offsetHeight;
+            }
+        });
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            
+            // Show sticky sidebar when scrolled past initial TOC
+            if (scrollY > tocOffset + 100) {
+                sidebarNav.classList.add('visible');
+            } else {
+                sidebarNav.classList.remove('visible');
+            }
+            
+            // Show back to top button
+            if (scrollY > 300) {
+                backToTop.style.display = 'flex';
+            } else {
+                backToTop.style.display = 'none';
+            }
+            
+            // Highlight active section in sidebar
+            updateActiveNavLink();
+        });
+
+        // Update active navigation link based on scroll position
+        function updateActiveNavLink() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.offsetHeight;
+                
+                if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Initial check
+        updateActiveNavLink();
+
+        // Initialize DataTables with scroll configuration
+        $(document).ready(function() {
+            // Cấu hình cho bảng Conditions và Actions - chỉ có 1 cuộn
+            const scrollConfig = {
+                responsive: true,
+                paging: false,
+                searching: false,
+                ordering: false,
+                info: false,
+                scrollY: '400px',
+                scrollCollapse: true,
+                scrollX: true,
+                autoWidth: false,
+                dom: 'rt',  // chỉ hiển thị table và scroll
+                language: {
+                    emptyTable: "Không có dữ liệu"
+                }
+            };
+
+            // Cấu hình cho các bảng khác (có .table-container bao ngoài)
+            const normalConfig = {
+                responsive: true,
+                paging: false,
+                searching: false,
+                ordering: false,
+                info: false,
+                autoWidth: false,
+                dom: 't'  // chỉ hiển thị table
+            };
+
+            // Khởi tạo bảng Conditions và Actions với scroll
+            if ($('#conditionsTable').length) {
+                $('#conditionsTable').DataTable(scrollConfig);
+            }
+            
+            if ($('#actionsTable').length) {
+                $('#actionsTable').DataTable(scrollConfig);
+            }
+
+            // Khởi tạo các bảng khác
+            $('table.display').not('#conditionsTable, #actionsTable').each(function() {
+                if (!$.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable(normalConfig);
+                }
+            });
+
+            // Adjust table container height on window resize
+            $(window).on('resize', function() {
+                $('table.display').DataTable().columns.adjust().responsive.recalc();
+            });
+        });
+    </script>
+</body>
+</html>

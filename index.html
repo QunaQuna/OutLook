@@ -3,46 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exchange Online - Tạo Folder và Rules Nâng Cao</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Exchange Online - Rules Generator v2.0</title>
+    
+    <!-- External Libraries CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <h1><i class="fas fa-mail-bulk"></i> Exchange Online - Tạo Folder và Rules Nâng Cao</h1>
-            <p class="subtitle">Tạo script PowerShell để thiết lập Outlook tự động với đầy đủ tính năng Rules</p>
+            <h1>
+                <i class="fas fa-mail-bulk"></i> 
+                Exchange Online - Rules Generator
+                <span class="version-badge">v2.0</span>
+            </h1>
+            <p class="subtitle">Tạo script PowerShell tự động với cây folder 5 cấp và rules nâng cao</p>
         </div>
         
         <div class="content">
+            <!-- Account Info Section -->
             <div class="section">
-                <h2 class="section-title"><i class="fas fa-user-cog"></i> Thông tin tài khoản</h2>
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-cog"></i> Thông tin tài khoản
+                    </h2>
+                </div>
                 
                 <div class="form-group">
-                    <label for="userEmail">Email tài khoản Exchange Online *</label>
+                    <label for="userEmail">
+                        <i class="fas fa-envelope"></i> Email tài khoản Exchange Online *
+                    </label>
                     <input type="email" id="userEmail" placeholder="user@company.com" required>
                 </div>
                 
                 <div class="instruction-box">
-                    <strong><i class="fas fa-exclamation-triangle"></i> LƯU Ý QUAN TRỌNG:</strong>
+                    <strong><i class="fas fa-exclamation-triangle"></i> HƯỚNG DẪN SỬ DỤNG:</strong>
                     <ol id="instructionsList">
-                        <li>Thiết lập folder và rules ở các mục bên dưới</li>
-                        <li>Set-ExecutionPolicy Bypass -Scope Process -Force</li>
-                        
-                        <li>Chạy lệnh: <code>Unblock-File -Path "đường-dẫn-đến-file.ps1"</code></li>
-                        <li>.\yourfile.ps1 -Mailbox user@company.com</li>
+                        <li>Nhập email và thiết lập folder/rules bên dưới</li>
+                        <li>Mở PowerShell với quyền Admin</li>
+                        <li>Chạy: <code>Set-ExecutionPolicy Bypass -Scope Process -Force</code></li>
+                        <li>Chạy: <code>Unblock-File -Path "file.ps1"</code></li>
+                        <li>Chạy: <code>.\yourfile.ps1</code></li>
                     </ol>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="folderCount">0</div>
+                        <div class="stat-label">Folders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="ruleCount">0</div>
+                        <div class="stat-label">Rules</div>
+                    </div>
                 </div>
             </div>
             
+            <!-- Folder Structure Section -->
             <div class="section">
-                <h2 class="section-title"><i class="fas fa-folder-tree"></i> Cấu trúc Folder</h2>
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-folder-tree"></i> Cấu trúc Folder (5 cấp)
+                    </h2>
+                    <div class="section-actions">
+                        <button class="template-btn" onclick="showAddFolderModal(null)" title="Thêm folder gốc">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
                 
                 <div class="template-buttons">
-                    <button class="template-btn" onclick="loadTemplate('accounting')">Kế toán</button>
-                    <button class="template-btn" onclick="loadTemplate('project')">Dự án</button>
-                    <button class="template-btn" onclick="loadTemplate('simple')">Đơn giản</button>
-                    <button class="template-btn" onclick="clearFolders()"><i class="fas fa-trash"></i> Xóa hết</button>
+                    <button class="template-btn" onclick="loadTemplate('accounting')">
+                        <i class="fas fa-calculator"></i> Kế toán
+                    </button>
+                    <button class="template-btn" onclick="loadTemplate('project')">
+                        <i class="fas fa-project-diagram"></i> Dự án
+                    </button>
+                    <button class="template-btn" onclick="loadTemplate('simple')">
+                        <i class="fas fa-list"></i> Đơn giản
+                    </button>
+                    <button class="template-btn" onclick="clearFolders()" style="background: #fee;">
+                        <i class="fas fa-trash"></i> Xóa hết
+                    </button>
                 </div>
                 
                 <div id="foldersTree">
@@ -54,19 +101,28 @@
                         </button>
                     </div>
                 </div>
-                
-                <button class="btn btn-secondary" onclick="showAddFolderModal(null)" style="width: 100%;">
-                    <i class="fas fa-plus"></i> Thêm Folder Mới
-                </button>
             </div>
             
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-filter"></i> Rules Tự Động Nâng Cao</h2>
-                <ul style="font-size: 12px;">
-                    <li>Sau khi chọn loại điều kiện thì nhấn nút thêm điều kiện 1 lần nữa</li>
-                    <li>Các từ khóa của điều kiện ngăn cách nhau bằng nhấn Enter</li>
-                    <li>Tương tự với thêm action của rules</li>
-                </ul>
+            <!-- Rules Section -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-filter"></i> Rules Tự Động Nâng Cao
+                    </h2>
+                    <div class="section-actions">
+                        <button class="template-btn" onclick="addNewRule()" title="Thêm rule mới">
+                            <i class="fas fa-plus"></i> Thêm Rule
+                        </button>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Hướng dẫn:</strong> 
+                    Chọn loại điều kiện và hành động - tự động cập nhật khi thay đổi. 
+                    Các từ khóa ngăn cách bằng Enter.
+                </div>
+                
                 <div id="rulesContainer">
                     <div class="empty-state" id="emptyRules">
                         <i class="fas fa-filter"></i>
@@ -76,46 +132,60 @@
                         </button>
                     </div>
                 </div>
-                
-                <button class="btn btn-secondary" onclick="addNewRule()" style="width: 100%; margin-top: 10px;">
-                    <i class="fas fa-plus"></i> Thêm Rule Mới
-                </button>
             </div>
             
-            <div class="section">
-                <h2 class="section-title"><i class="fas fa-cogs"></i> Tùy chọn Script</h2>
-                
-                <div class="form-group">
-                    <label for="scriptName">Tên file script *</label>
-                    <input type="text" id="scriptName" value="create_outlook_rules" required>
-                    <small>Tự động thêm .ps1 nếu chưa có</small>
+            <!-- Script Options Section -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-cogs"></i> Tùy chọn Script
+                    </h2>
                 </div>
                 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="createAllFolders" checked>
-                    <label for="createAllFolders">Tạo tất cả folder trong script</label>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="form-group">
+                        <label for="scriptName">
+                            <i class="fas fa-file-code"></i> Tên file script *
+                        </label>
+                        <input type="text" id="scriptName" value="create_outlook_rules" required>
+                        <small>Tự động thêm .ps1 nếu chưa có</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="additionalNotes">
+                            <i class="fas fa-sticky-note"></i> Ghi chú thêm
+                        </label>
+                        <textarea id="additionalNotes" placeholder="Nhập ghi chú, lưu ý thêm..." rows="3"></textarea>
+                    </div>
                 </div>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="enableAllRules" checked>
-                    <label for="enableAllRules">Kích hoạt tất cả rules trong script</label>
-                </div>
-                
-                <div class="form-group">
-                    <label for="additionalNotes">Ghi chú thêm cho script</label>
-                    <textarea id="additionalNotes" placeholder="Nhập ghi chú, lưu ý thêm..." rows="3"></textarea>
+
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="createAllFolders" checked>
+                        <label for="createAllFolders">
+                            <i class="fas fa-folder-plus"></i> Tạo tất cả folder trong script
+                        </label>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enableAllRules" checked>
+                        <label for="enableAllRules">
+                            <i class="fas fa-toggle-on"></i> Kích hoạt tất cả rules trong script
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
         
+        <!-- Action Buttons -->
         <div class="actions">
             <button class="btn btn-secondary" onclick="previewScript()">
-                <i class="fas fa-eye"></i> Xem trước
+                <i class="fas fa-eye"></i> Xem trước Script
             </button>
-            <button class="btn btn-success" onclick="copyScriptToClipboard()">
+            <button class="btn btn-info" onclick="copyScriptToClipboard()">
                 <i class="fas fa-copy"></i> Sao chép Script
             </button>
-            <button class="btn btn-primary" onclick="downloadScriptFile()" id="downloadBtn">
+            <button class="btn btn-success" onclick="downloadScriptFile()">
                 <i class="fas fa-download"></i> Tải File (.ps1)
             </button>
         </div>
@@ -125,25 +195,36 @@
     <div class="modal" id="folderModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Thêm Folder Mới</h3>
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-folder-plus"></i> Thêm Folder Mới
+                </h3>
                 <button class="close-modal" onclick="closeFolderModal()">&times;</button>
             </div>
             
             <div class="form-group">
-                <label for="folderName">Tên Folder *</label>
+                <label for="folderName">
+                    <i class="fas fa-tag"></i> Tên Folder *
+                </label>
                 <input type="text" id="folderName" placeholder="VD: HOA DON DAU VAO" required>
             </div>
             
             <div class="form-group">
-                <label for="parentFolder">Folder cha (nếu có)</label>
-                <select id="parentFolder">
-                    <option value="">-- Chọn folder cha (Folder gốc) --</option>
+                <label for="parentFolder">
+                    <i class="fas fa-sitemap"></i> Folder cha (tùy chọn)
+                </label>
+                <select id="parentFolder" class="select2-folder">
+                    <option value="">-- Folder gốc (Inbox) --</option>
                 </select>
+                <small>Hỗ trợ tối đa 5 cấp folder</small>
             </div>
             
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeFolderModal()">Hủy</button>
-                <button class="btn btn-primary" onclick="saveFolder()">Lưu Folder</button>
+                <button class="btn btn-secondary" onclick="closeFolderModal()">
+                    <i class="fas fa-times"></i> Hủy
+                </button>
+                <button class="btn btn-primary" onclick="saveFolder()">
+                    <i class="fas fa-save"></i> Lưu Folder
+                </button>
             </div>
         </div>
     </div>
@@ -152,16 +233,29 @@
     <div class="modal preview-modal" id="previewModal">
         <div class="modal-content preview-content">
             <div class="modal-header">
-                <h3 class="modal-title">Xem trước Script PowerShell</h3>
+                <h3 class="modal-title">
+                    <i class="fas fa-code"></i> Xem trước Script PowerShell
+                </h3>
                 <button class="close-modal" onclick="closePreviewModal()">&times;</button>
             </div>
             <pre class="preview-text" id="previewText"></pre>
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closePreviewModal()">Đóng</button>
+                <button class="btn btn-secondary" onclick="closePreviewModal()">
+                    <i class="fas fa-times"></i> Đóng
+                </button>
+                <button class="btn btn-success" onclick="downloadFromPreview()">
+                    <i class="fas fa-download"></i> Tải xuống
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- External Libraries JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom JS -->
     <script src="script.js"></script>
 </body>
 </html>
